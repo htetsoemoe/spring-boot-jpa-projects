@@ -18,7 +18,7 @@ public class TutorialDetails implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	private long id;
+	private Long id;
 	
 	private Date createOn;
 	private String createdBy;

@@ -2,12 +2,15 @@ package com.ninja.spring.onetoone.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+@JsonIgnoreProperties(value = "hibernateLazyInitializer")
 @Entity
 @Table(name = "tutorials")
 public class Tutorial implements Serializable {
@@ -16,7 +19,7 @@ public class Tutorial implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 
 	private String title;
 	private String description;
