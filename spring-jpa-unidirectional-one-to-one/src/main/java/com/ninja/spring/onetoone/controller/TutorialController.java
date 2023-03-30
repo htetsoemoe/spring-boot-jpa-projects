@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -13,6 +12,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +39,7 @@ public class TutorialController {
 			tutorialRepo.findByTitleContaining(title).forEach(tutorials::add);
 		}
 		
+		// if there is no record in database
 		if (tutorials.isEmpty()) {
 			return new ResponseEntity<List<Tutorial>>(HttpStatus.NO_CONTENT);
 		}
@@ -57,13 +58,43 @@ public class TutorialController {
 	@PostMapping("/tutorials")
 	public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial, BindingResult bindingResult) {
 		if (!bindingResult.hasErrors()) {
-			Tutorial createdTutorial = tutorialRepo.save(new Tutorial(tutorial.getId(), tutorial.getTitle(), tutorial.getDescription(), true));
+			Tutorial createdTutorial = tutorialRepo.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(), false));
 			
 			return new ResponseEntity<Tutorial>(createdTutorial, HttpStatus.CREATED);
 		} else {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Request contains incorrect data %s", getError(bindingResult)));
 		}
 	}
+	
+	@PutMapping("/tutorials/{id}")
+	public ResponseEntity<Tutorial> updateTutorial(@PathVariable long id, @RequestBody Tutorial tutorial) {
+		// find tutorial form database
+		Tutorial searchTutorial = tutorialRepo.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		
+		// if tutorial is exist
+		searchTutorial.setTitle(tutorial.getTitle());
+		searchTutorial.setPublished(tutorial.getPublished());
+		searchTutorial.setDescription(tutorial.getDescription());
+	
+		return new ResponseEntity<Tutorial>(tutorialRepo.save(searchTutorial), HttpStatus.OK);
+	}
+	
+	@GetMapping("/tutorials/published")
+	public ResponseEntity<List<Tutorial>> findByPublished() {
+		
+		// find published tutorial value 'true'
+		List<Tutorial> publishedTutorial = tutorialRepo.findByPublished(true);
+		
+		if (publishedTutorial.isEmpty()) {
+			return new ResponseEntity<List<Tutorial>>(HttpStatus.NO_CONTENT);
+		}
+		
+		return new ResponseEntity<List<Tutorial>>(publishedTutorial, HttpStatus.OK);
+	}
+	
+	
+
 
 	private String getError(BindingResult bindingResult) {		
 		return bindingResult.getAllErrors().stream()
