@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ninja.spring.onetoone.model.Tutorial;
+import com.ninja.spring.onetoone.repository.TutorialDetailsRepo;
 import com.ninja.spring.onetoone.repository.TutorialRepo;
 
 @RestController
@@ -28,6 +30,8 @@ public class TutorialController {
 	
 	@Autowired
 	private TutorialRepo tutorialRepo;
+	@Autowired
+	private TutorialDetailsRepo tutorialDetailsRepo;
 	
 	@GetMapping("/tutorials")
 	public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
@@ -93,8 +97,23 @@ public class TutorialController {
 		return new ResponseEntity<List<Tutorial>>(publishedTutorial, HttpStatus.OK);
 	}
 	
+	@DeleteMapping("/tutorials/{id}")
+	public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable long id) {
+		if (tutorialDetailsRepo.existsById(id)) {
+			tutorialDetailsRepo.deleteById(id);
+		}
+		
+		tutorialRepo.deleteById(id);
+		
+		return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+	}
 	
-
+	@DeleteMapping("/tutorials")
+	public ResponseEntity<HttpStatus> deleteAllTutorial() {
+		tutorialRepo.deleteAll();
+		
+		return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+	}
 
 	private String getError(BindingResult bindingResult) {		
 		return bindingResult.getAllErrors().stream()
