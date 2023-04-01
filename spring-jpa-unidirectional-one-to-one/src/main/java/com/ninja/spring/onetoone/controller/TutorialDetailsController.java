@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ninja.spring.onetoone.exception.ResourceNotFoundException;
 import com.ninja.spring.onetoone.model.Tutorial;
 import com.ninja.spring.onetoone.model.TutorialDetails;
 import com.ninja.spring.onetoone.repository.TutorialDetailsRepo;
@@ -31,7 +32,7 @@ public class TutorialDetailsController {
 	public ResponseEntity<TutorialDetails> createTutorialDetails(@PathVariable long tutorialId, @RequestBody TutorialDetails tutorialDetails) {
 		// find existed tutorial with tutorialId
 		Tutorial tutorial = tutorialRepo.findById(tutorialId)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with %d".formatted(tutorialId)));
 		
 		tutorialDetails.setCreateOn(new java.util.Date());
 		tutorialDetails.setTutorial(tutorial);
@@ -43,7 +44,7 @@ public class TutorialDetailsController {
 	@GetMapping("/tutorials/{tutorialId}/details")
 	public ResponseEntity<TutorialDetails> getTutorialDetails(@PathVariable long tutorialId) {
 		TutorialDetails tutorialDetails = tutorialDetailRepo.findById(tutorialId)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.orElseThrow(() -> new ResourceNotFoundException("Not found Tutorila with %d".formatted(tutorialId)));
 		
 		return new ResponseEntity<TutorialDetails>(tutorialDetails, HttpStatus.OK);
 	}
@@ -53,7 +54,7 @@ public class TutorialDetailsController {
 	public ResponseEntity<TutorialDetails> updateDetails(@PathVariable long id, @RequestBody TutorialDetails tutorialDetails) {
 		// find TutorialDetails by Id
 		TutorialDetails details = tutorialDetailRepo.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with %d".formatted(id)));
 		
 		details.setCreatedBy(tutorialDetails.getCreatedBy());
 		

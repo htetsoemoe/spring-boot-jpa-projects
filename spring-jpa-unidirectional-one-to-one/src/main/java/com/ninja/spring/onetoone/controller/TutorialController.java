@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ninja.spring.onetoone.exception.ResourceNotFoundException;
 import com.ninja.spring.onetoone.model.Tutorial;
 import com.ninja.spring.onetoone.repository.TutorialDetailsRepo;
 import com.ninja.spring.onetoone.repository.TutorialRepo;
@@ -54,7 +55,7 @@ public class TutorialController {
 	@GetMapping("/tutorials/{id}")
 	public ResponseEntity<Tutorial> getTutorialById(@PathVariable("id") long id) {
 		Tutorial tutorial = tutorialRepo.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with %d".formatted(id)));
 		
 		return new ResponseEntity<Tutorial>(tutorial, HttpStatus.OK);
 	}
@@ -74,7 +75,7 @@ public class TutorialController {
 	public ResponseEntity<Tutorial> updateTutorial(@PathVariable long id, @RequestBody Tutorial tutorial) {
 		// find tutorial form database
 		Tutorial searchTutorial = tutorialRepo.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with %d".formatted(id)));
 		
 		// if tutorial is exist
 		searchTutorial.setTitle(tutorial.getTitle());
