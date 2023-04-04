@@ -35,7 +35,7 @@ public class TutorialController {
 	public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial, BindingResult bindingResult) {
 		if (!bindingResult.hasErrors()) {
 			Tutorial createdTutorial = tutorialRepo.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(), false));		
-			return new ResponseEntity<Tutorial>(createdTutorial, HttpStatus.OK);
+			return new ResponseEntity<Tutorial>(createdTutorial, HttpStatus.CREATED);
 		}
 		
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Request contains incorrect data %s", getError(bindingResult)));
@@ -93,7 +93,7 @@ public class TutorialController {
 		findedTutorial.setDescription(tutorial.getDescription());
 		findedTutorial.setPublished(tutorial.getPublished());
 		
-		return new ResponseEntity<Tutorial>(tutorialRepo.save(findedTutorial), HttpStatus.OK);
+		return new ResponseEntity<Tutorial>(tutorialRepo.save(findedTutorial), HttpStatus.CREATED);
 	}
 	
 	@DeleteMapping("/tutorials/{id}")
