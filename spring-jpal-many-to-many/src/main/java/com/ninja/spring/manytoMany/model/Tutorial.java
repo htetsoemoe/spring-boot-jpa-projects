@@ -96,7 +96,7 @@ public class Tutorial implements Serializable{
 		this.tags = tags;
 	}
 	
-	public void add(Tag tag) {
+	public void addTag(Tag tag) {
 		this.tags.add(tag);
 		tag.getTutorials().add(this);// add tutorial ID
 	}
