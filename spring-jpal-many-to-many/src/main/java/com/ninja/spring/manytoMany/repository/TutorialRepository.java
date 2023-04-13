@@ -10,6 +10,8 @@ import com.ninja.spring.manytoMany.model.Tutorial;
 @Repository
 public interface TutorialRepository extends JpaRepository<Tutorial, Long>{
 	
+	List<Tutorial> findByTitleContaining(String title);
+	List<Tutorial> findByPublished(boolean published);
 	List<Tutorial> findTutorialsByTagsId(Long tagId);
 
 }
