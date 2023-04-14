@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ninja.spring.manytoMany.exception.ResourceNotFoundException;
 import com.ninja.spring.manytoMany.model.Tag;
 import com.ninja.spring.manytoMany.model.Tutorial;
 import com.ninja.spring.manytoMany.repository.TagRepository;
@@ -41,7 +42,7 @@ public class TagController {
 			// If Tag was already exits
 			if (tagId != 0L) {
 				Tag existedTag = tagRepo.findById(tagId)
-						.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tag with ID %d", tagId)));
+						.orElseThrow(() -> new ResourceNotFoundException(String.format("Not found tag with ID %d", tagId)));
 				
 				// add existed tag to tutorial's tag
 				tutorial.addTag(existedTag);
@@ -54,7 +55,7 @@ public class TagController {
 			tutorial.addTag(requestTag);
 			return tagRepo.save(requestTag);
 			
-		}).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tutorial with ID %d", tutorialId)));
+		}).orElseThrow(() -> new ResourceNotFoundException(String.format("Not found tutorial with ID %d", tutorialId)));
 		
 		return new ResponseEntity<Tag>(tag, HttpStatus.CREATED);
 	}
@@ -76,7 +77,7 @@ public class TagController {
 	@GetMapping("/tutorials/{tutorialId}/tags")
 	public ResponseEntity<List<Tag>> getAllTagsByTutorialId(@PathVariable long tutorialId) {
 		if (!tutorialRepo.existsById(tutorialId)) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tutorial with ID %d", tutorialId));
+			throw new ResourceNotFoundException(String.format("Not found tutorial with ID %d", tutorialId));
 		}
 		
 		List<Tag> tags = tagRepo.findTagsByTutorialsId(tutorialId);
@@ -86,7 +87,7 @@ public class TagController {
 	@GetMapping("/tags/{id}")
 	public ResponseEntity<Tag> getTagsById(@PathVariable long id) {
 		Tag tag = tagRepo.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tag with ID %d", id)));
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Not found tag with ID %d", id)));
 		
 		return new ResponseEntity<Tag>(tag, HttpStatus.OK);
 	}
@@ -94,7 +95,7 @@ public class TagController {
 	@GetMapping("/tags/{tagId}/tutorials")
 	public ResponseEntity<List<Tutorial>> getAllTutorialsByTagId(@PathVariable long tagId) {
 		if (!tagRepo.existsById(tagId)) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tag with ID %d", tagId));
+			throw new ResourceNotFoundException(String.format("Not found tag with ID %d", tagId));
 		}
 		
 		List<Tutorial> tutorials = tutorialRepo.findTutorialsByTagsId(tagId);
@@ -104,7 +105,7 @@ public class TagController {
 	@PutMapping("/tags/{tagId}")
 	public ResponseEntity<Tag> updateTag(@PathVariable long tagId, @RequestBody Tag requestTag) {
 		Tag tag = tagRepo.findById(tagId)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tag with ID %d", tagId)));
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Not found tag with ID %d", tagId)));
 		
 		tag.setName(requestTag.getName());
 		return new ResponseEntity<Tag>(tagRepo.save(tag), HttpStatus.OK);
@@ -114,7 +115,7 @@ public class TagController {
 	@DeleteMapping("/tutorials/{tutorialId}/tags/{tagId}")
 	public ResponseEntity<HttpStatus> deleteTagFromTutorial(@PathVariable long tutorialId, @PathVariable long tagId) {
 		Tutorial tutorial = tutorialRepo.findById(tutorialId)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tutorial with ID %d", tutorialId)));
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Not found tutorial with ID %d", tutorialId)));
 		
 		tutorial.removeTag(tagId);
 		tutorialRepo.save(tutorial);
@@ -129,6 +130,6 @@ public class TagController {
 			tagRepo.deleteById(tagId);
 			return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
 		}
-		throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tag with ID %d", tagId));
+		throw new ResourceNotFoundException(String.format("Not found tag with ID %d", tagId));
 	}
 }

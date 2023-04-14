@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ninja.spring.manytoMany.exception.ResourceNotFoundException;
 import com.ninja.spring.manytoMany.model.Tutorial;
 import com.ninja.spring.manytoMany.repository.TutorialRepository;
 
@@ -67,7 +68,7 @@ public class TutorialController {
 	@GetMapping("/tutorials/{id}")
 	public ResponseEntity<Tutorial> getTutorialById(@PathVariable long id) {
 		Tutorial tutorial = tutorialRepo.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tutorial with ID : %d", id)));
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Not found tutorial with ID : %d", id)));
 		
 		return new ResponseEntity<Tutorial>(tutorial, HttpStatus.OK);
 	}
@@ -86,7 +87,7 @@ public class TutorialController {
 	@PutMapping("/tutorials/{id}")
 	public ResponseEntity<Tutorial> updateTutorial(@PathVariable long id, @RequestBody Tutorial tutorial) {
 		Tutorial searchedTutorial = tutorialRepo.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found tutorial with ID : %d", id)));
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Not found tutorial with ID : %d", id)));
 		
 		searchedTutorial.setTitle(tutorial.getTitle());
 		searchedTutorial.setDescription(tutorial.getDescription());
